@@ -21,3 +21,6 @@ jobs:
 
       - name: Push Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend
+
+      - name: Debug Image Name
+        run: echo ${{ secrets.DOCKER_USERNAME }}/mern-backend
