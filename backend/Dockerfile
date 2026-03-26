@@ -4,12 +4,12 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm ci --omit=dev
 
 COPY . .
 
-# Stage 2: Final minimal image
-FROM node:18-alpine
+# Stage 2: Distroless runtime
+FROM gcr.io/distroless/nodejs18
 
 WORKDIR /app
 
@@ -17,4 +17,4 @@ COPY --from=builder /app .
 
 EXPOSE 5000
 
-CMD ["node", "server.js"]
+CMD ["server.js"]
