@@ -14,6 +14,15 @@ spec:
     spec:
       containers:
       - name: mern-backend
-        image: kushal200007029/mern-backend:latest
+        image: ku2972000/mern-backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
+
+        # 🔐 Environment variables from Kubernetes Secret
+        env:
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: mern-secret
+              key: MONGO_URI
