@@ -1,11 +1,19 @@
-FROM node:18
+# Stage 1: Build dependencies
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --only=production
 
 COPY . .
+
+# Stage 2: Final minimal image
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app .
 
 EXPOSE 5000
 
