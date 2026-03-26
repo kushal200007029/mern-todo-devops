@@ -3,15 +3,13 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Set production mode
 ENV NODE_ENV=production
 
 COPY package*.json ./
 
-# Install only production deps + clean cache
 RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy only required files
+# Copy app files
 COPY server.js .
 COPY config ./config
 COPY models ./models
@@ -22,7 +20,10 @@ FROM gcr.io/distroless/nodejs18
 
 WORKDIR /app
 
-# Copy only needed runtime files
+# 🔥 CRITICAL: include package.json
+COPY --from=builder /app/package.json ./package.json
+
+# Copy runtime files
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/server.js .
 COPY --from=builder /app/config ./config
