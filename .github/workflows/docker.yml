@@ -1,4 +1,4 @@
-name: Build & Push Docker Image
+name: CI - Build & Push Docker Image
 
 on:
   push:
@@ -9,30 +9,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      IMAGE_NAME: mern-backend
-
     steps:
-      # ✅ Checkout latest code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # ✅ Login to Docker Hub (with verification)
       - name: Login to Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker info | grep Username
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # ✅ Build Docker Image
+      # 🔥 SET UNIQUE IMAGE TAG
+      - name: Set Image Tag
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      # 🐳 BUILD IMAGE WITH TAG
       - name: Build Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest ./backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend:$TAG ./backend
 
-      # ✅ Verify Image Exists
-      - name: List Images
-        run: docker images
-
-      # ✅ Push Image
+      # 📤 PUSH IMAGE
       - name: Push Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend:$TAG
