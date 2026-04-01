@@ -5,6 +5,9 @@ import { MdModeEditOutline } from "react-icons/md";
 import { FaTrash } from "react-icons/fa6";
 import { IoClipboardOutline } from "react-icons/io5";
 import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 function App() {
   const [newTodo, setNewTodo] = useState("");
   const [todos, setTodos] = useState([]);
@@ -15,7 +18,7 @@ function App() {
     e.preventDefault();
     if (!newTodo.trim()) return;
     try {
-      const response = await axios.post("/api/todos", { text: newTodo });
+      const response = await axios.post(`${API_URL}/api/todos`, { text: newTodo });
       setTodos([...todos, response.data]);
       setNewTodo("");
     } catch (error) {
@@ -25,7 +28,7 @@ function App() {
 
   const fetchTodos = async () => {
     try {
-      const response = await axios.get("/api/todos");
+      const response = await axios.get(`${API_URL}/api/todos`);
       console.log(response.data);
       setTodos(response.data);
     } catch (error) {
@@ -44,9 +47,7 @@ function App() {
 
   const saveEdit = async (id) => {
     try {
-      const response = await axios.patch(`/api/todos/${id}`, {
-        text: editedText,
-      });
+      const response = await axios.patch(`${API_URL}/api/todos/${id}`, { text: editedText });
       setTodos(todos.map((todo) => (todo._id === id ? response.data : todo)));
       setEditingTodo(null);
     } catch (error) {
@@ -56,24 +57,27 @@ function App() {
 
   const deleteTodo = async (id) => {
     try {
-      await axios.delete(`/api/todos/${id}`);
+      await axios.delete(`${API_URL}/api/todos/${id}`);
       setTodos(todos.filter((todo) => todo._id !== id));
     } catch (error) {
       console.log("Error deleting todo:", error);
     }
   };
 
-  const toggleTodo = async (id) => {
-    try {
-      const todo = todos.find((t) => t._id === id);
-      const response = await axios.patch(`/api/todos/${id}`, {
-        completed: !todo.completed,
-      });
-      setTodos(todos.map((t) => (t._id === id ? response.data : t)));
-    } catch (error) {
-      console.log("Error toggline todo:", error);
-    }
-  };
+const toggleTodo = async (id) => {
+  try {
+    const todo = todos.find((t) => t._id === id);
+
+    const response = await axios.patch(
+      `${API_URL}/api/todos/${id}`,
+      { completed: !todo.completed }
+    );
+
+    setTodos(todos.map((t) => (t._id === id ? response.data : t)));
+  } catch (error) {
+    console.log("Error toggling todo:", error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from gray-50 to-gray-100 flex items-center justify-center p-4">
