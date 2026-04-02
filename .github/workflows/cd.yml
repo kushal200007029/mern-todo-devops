@@ -2,7 +2,7 @@ name: CD Pipeline
 
 on:
   workflow_run:
-    workflows: ["CI Pipeline"]
+    workflows: ["CI - Build & Push Docker Image"]
     types:
       - completed
 
@@ -19,7 +19,7 @@ jobs:
 
       - name: Set image tag
         run: |
-          echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
+        echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" | cut -c1-7 >> $GITHUB_ENV
 
       - name: Debug image tag
         run: echo "Deploying image with tag $IMAGE_TAG"
