@@ -14,18 +14,44 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2️⃣ Set image tag (same as CI)
       - name: Set image tag
         run: |
           SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
           echo "IMAGE_TAG=$SHORT_SHA" >> $GITHUB_ENV
 
+      # 3️⃣ Debug (important for troubleshooting)
       - name: Debug image tag
         run: echo "Deploying image with tag $IMAGE_TAG"
 
-      # Placeholder for future Kubernetes deployment
-      - name: Deploy (Placeholder)
+      # 4️⃣ Install kubectl
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # 5️⃣ Setup kubeconfig (from GitHub Secret)
+      - name: Setup Kubeconfig
         run: |
-          echo "This is where deployment will happen"
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+
+      # 6️⃣ Replace IMAGE_TAG in deployment.yaml
+      - name: Update Deployment Image
+        run: |
+          sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" k8s/deployment.yaml
+
+      # 7️⃣ Apply Kubernetes manifests
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      # 8️⃣ Verify rollout
+      - name: Verify Deployment
+        run: |
+          kubectl rollout status deployment/mern-backend
