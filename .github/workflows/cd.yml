@@ -19,8 +19,8 @@ jobs:
 
       - name: Set image tag
         run: |
-        SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
-        echo "IMAGE_TAG=$SHORT_SHA" >> $GITHUB_ENV
+          SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+          echo "IMAGE_TAG=$SHORT_SHA" >> $GITHUB_ENV
 
       - name: Debug image tag
         run: echo "Deploying image with tag $IMAGE_TAG"
