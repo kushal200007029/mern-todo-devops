@@ -14,12 +14,11 @@ spec:
     spec:
       containers:
       - name: mern-backend
-        image: ku2972000/mern-backend:latest
+        image: ku2972000/mern-backend:IMAGE_TAG   # ✅ FIXED
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
 
-        # 🔐 Environment variables from Kubernetes Secret
         env:
         - name: MONGO_URI
           valueFrom:
