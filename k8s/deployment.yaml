@@ -3,25 +3,28 @@ kind: Deployment
 metadata:
   name: mern-backend
 spec:
-  replicas: 3
+  replicas: 1
+
   selector:
     matchLabels:
       app: mern-backend
+
   template:
     metadata:
       labels:
         app: mern-backend
+
     spec:
       containers:
       - name: mern-backend
-        image: ku2972000/mern-backend:IMAGE_TAG   # ✅ FIXED
+
+        image: kushaldevopsengg/mern-backend:v1
+
         imagePullPolicy: Always
+
         ports:
         - containerPort: 5000
 
         env:
         - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              name: mern-secret
-              key: MONGO_URI
+          value: mongodb://mongodb-service:27017/todo
