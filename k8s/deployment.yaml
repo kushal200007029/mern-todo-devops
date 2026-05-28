@@ -25,6 +25,27 @@ spec:
         ports:
         - containerPort: 5000
 
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+
         env:
         - name: MONGO_URI
-          value: mongodb://mongodb-service:27017/todo
+          valueFrom:
+           secretKeyRef:
+             name: mern-secret
+             key: MONGO_URI
